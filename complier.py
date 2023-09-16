@@ -135,7 +135,8 @@ label_list = []
 machine_list = []
 folder_path = "assembly_code"
 file_names = os.listdir(folder_path)
-for page in range(file_names):
+for page in range(len(file_names)):
+    print(f"Page name: {file_names[page]}")
     if file_names[page].endswith(".txt"):
         file_path = os.path.join(folder_path, file_names[page])
         with open(file_path, 'r') as file:
@@ -146,17 +147,22 @@ for page in range(file_names):
             
             for i in range(len(instruction_all)):
                 instruction_current = instruction_all[i]
-               
+                # แปลงคำสั่งเป็น machine code
                 machine_code = convert_to_machine_code(instruction_current,i)
                 machine_list.append(machine_code)
                 print(f"(address {i}): {machine_code} ({hex(machine_code)})")
+            file.close()
             
-
-            save_file = open(f"machine_code/machine{page}.txt", "w")
+            # บันทึกไฟล์
+            save_file = open(f"machine_code/machine{page+1}.txt", "w")
             for i in range(len(machine_list)):
                 save_file.writelines(f"{machine_list[i]}")
                 save_file.writelines("\n")
-                
+            # ล้างค่า
+            machine_list.clear()
+            instruction_all.clear()
+            label_list.clear()
+            
             save_file.close()
             print("Save file success")
             
