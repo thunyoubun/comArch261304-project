@@ -135,9 +135,9 @@ label_list = []
 machine_list = []
 folder_path = "assembly_code"
 file_names = os.listdir(folder_path)
-for file_name in file_names:
-    if file_name.endswith(".txt"):
-        file_path = os.path.join(folder_path, file_name)
+for page in range(file_names):
+    if file_names[page].endswith(".txt"):
+        file_path = os.path.join(folder_path, file_names[page])
         with open(file_path, 'r') as file:
             # อ่านไฟล์และแยกคำสั่ง
             for line in file:
@@ -151,5 +151,14 @@ for file_name in file_names:
                 machine_list.append(machine_code)
                 print(f"(address {i}): {machine_code} ({hex(machine_code)})")
             
-            print(f"Label: {label_list}")
+
+            save_file = open(f"machine_code/machine{page}.txt", "w")
+            for i in range(len(machine_list)):
+                save_file.writelines(f"{machine_list[i]}")
+                save_file.writelines("\n")
+                
+            save_file.close()
+            print("Save file success")
+            
+
 
