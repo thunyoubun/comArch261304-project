@@ -32,23 +32,24 @@ def offsetField(name_instruction, reg3, pc):
             raise Exception(f"ERROR: label {reg3} not found", exit(0))
         else:
             if name_instruction == 'beq':
-                # pc + 1  ตำแหน่งของคำสั่งถัดไป ถ้า regA == regB
-                offset = twoComplement_16bit(adds - pc - 1)
+                # offsetFiled ของ beq คือ ตำแหน่งของคำสั่งถัดไป - ตำแหน่งของคำสั่งปัจจุบัน - 1
+                offset = offset_2Complement_16bit(adds - pc - 1)
             elif name_instruction == 'lw' or name_instruction == 'sw':
-                offset = twoComplement_16bit(adds)
+                offset = offset_2Complement_16bit(adds)
 
     return int(offset)
 
-
-def twoComplement_16bit(num):
+# -3 = 1111111111111101
+# 3 = 0000000000000011
+def offset_2Complement_16bit(num):
     if num < 0:
         num = bin(num & 0b1111111111111111)[2:]
+        num = num.zfill(16)
 
     else:
         num = bin(num)[2:]
         num = num.zfill(16)
     return int(num, 2)
-
 
 def findAddressLabel(reg):
     for i in range(len(instruction_all)):
@@ -65,6 +66,7 @@ def analyze_instruction(instruction):
     else:
         raise Exception(
             f"ERROR: instruction {instruction} not found ", exit(0))
+    
 
 # แปลงคำสั่งเป็น machine code
 def convert_to_machine_code(instruction, idx):
@@ -142,14 +144,15 @@ opcode_table = {
     "jalr": {"opcode": 0b101, "type": "J"},
     "halt": {"opcode": 0b110, "type": "O"},
     "noop": {"opcode": 0b111, "type": "O"},
-
 }
 
+## constant
 instruction_all = []
 instruction_current = []
 label_list = []
 machine_list = []
 folder_path = "assembly_code"
+
 try:
     file_names = os.listdir(folder_path)
 except FileNotFoundError:
@@ -162,6 +165,7 @@ for page in range(len(file_names)):
         with open(file_path, 'r') as file:
             # อ่านไฟล์และแยกคำสั่ง
             for line in file:
+                line = line.lower()
                 line = line.replace("\n", "")
                 instruction_all.append(line.split())
 
