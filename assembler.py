@@ -266,12 +266,11 @@ def test_code():
                         if line == machine_list[i]:
                             pass
                         else:
+                            print(f"❌ {file_names[page]} is FAIL")
                             print(f"expect: {line} but got: {machine_list[i]}")
-                            print(f"{type(line)} {type(machine_list[i])}")
-                            print(f"{file_names[page]} is FAIL")
                             exit(0)
                         i += 1
-                    print(f"{file_names[page]} is PASS")
+                    print(f"✅ {file_names[page]} is PASS")
                     # ล้างค่า
                     machine_list.clear()
                     instruction_all.clear()
