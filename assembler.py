@@ -34,8 +34,10 @@ def offsetField(name_instruction, reg3, pc):
             if name_instruction == 'beq':
                 # offsetFiled ของ beq คือ ตำแหน่งของคำสั่งถัดไป - ตำแหน่งของคำสั่งปัจจุบัน - 1
                 offset = offset_2Complement_16bit(adds - pc - 1)
+                
             elif name_instruction == 'lw' or name_instruction == 'sw':
                 offset = offset_2Complement_16bit(adds)
+
 
     return int(offset)
 
@@ -153,39 +155,134 @@ label_list = []
 machine_list = []
 folder_path = "assembly_code"
 
-try:
-    file_names = os.listdir(folder_path)
-except FileNotFoundError:
-    print("Folder not found")
-    exit(0)
-for page in range(len(file_names)):
-    print(f"Page name: {file_names[page]}")
-    if file_names[page].endswith(".txt"):
-        file_path = os.path.join(folder_path, file_names[page])
-        with open(file_path, 'r') as file:
-            # อ่านไฟล์และแยกคำสั่ง
-            for line in file:
-                line = line.lower()
-                line = line.replace("\n", "")
-                instruction_all.append(line.split())
 
-            for i in range(len(instruction_all)):
-                instruction_current = instruction_all[i]
-                # แปลงคำสั่งเป็น machine code
-                machine_code = convert_to_machine_code(instruction_current, i)
-                machine_list.append(machine_code)
-                print(f"(address {i}): {machine_code} ({hex(machine_code)})")
-            file.close()
+def AllFile():
+    try:
+        file_names = os.listdir(folder_path)
+    except FileNotFoundError:
+        print("Folder not found")
+        exit(0)
+    for page in range(len(file_names)):
+        print(f"Page name: {file_names[page]}")
+        if file_names[page].endswith(".txt"):
+            file_path = os.path.join(folder_path, file_names[page])
+            with open(file_path, 'r') as file:
+                # อ่านไฟล์และแยกคำสั่ง
+                for line in file:
+                    line = line.lower()
+                    line = line.replace("\n", "")
+                    instruction_all.append(line.split())
 
-            # บันทึกไฟล์
-            save_file = open(f"machine_code/machine{page+1}.txt", "w")
-            for i in range(len(machine_list)):
-                save_file.writelines(f"{machine_list[i]}")
-                save_file.writelines("\n")
-            # ล้างค่า
-            machine_list.clear()
-            instruction_all.clear()
-            label_list.clear()
+                for i in range(len(instruction_all)):
+                    instruction_current = instruction_all[i]
+                    # แปลงคำสั่งเป็น machine code
+                    machine_code = convert_to_machine_code(instruction_current, i)
+                    machine_list.append(machine_code)
+                    print(f"(address {i}): {machine_code} ({hex(machine_code)})")
+                file.close()
 
-            save_file.close()
-            print("Save file success")
+                # บันทึกไฟล์
+                save_file = open(f"machine_code/machine{page+1}.txt", "w")
+                for i in range(len(machine_list)):
+                    save_file.writelines(f"{machine_list[i]}")
+                    save_file.writelines("\n")
+                # ล้างค่า
+                machine_list.clear()
+                instruction_all.clear()
+                label_list.clear()
+
+                save_file.close()
+                print("Save file success")
+
+
+    
+
+def OneFile(name_file):
+    try:
+        file_names = os.listdir(folder_path)
+    except FileNotFoundError:
+        print("Folder not found")
+        exit(0)
+    file_path = os.path.join(folder_path,name_file)
+    print(f"Page name: {file_path}")
+    with open(file_path,'r') as file:
+        # อ่านไฟล์และแยกคำสั่ง
+        for line in file:
+            line = line.lower()
+            line = line.replace("\n", "")
+            instruction_all.append(line.split())
+
+        for i in range(len(instruction_all)):
+            instruction_current = instruction_all[i]
+            # แปลงคำสั่งเป็น machine code
+            machine_code = convert_to_machine_code(instruction_current, i)
+            machine_list.append(machine_code)
+            print(f"(address {i}): {machine_code} ({hex(machine_code)})")
+        file.close()
+
+        # บันทึกไฟล์
+        save_file = open(f"machine_code/machineTest.txt", "w")
+        for i in range(len(machine_list)):
+            save_file.writelines(f"{machine_list[i]}")
+            save_file.writelines("\n")
+        # ล้างค่า
+        machine_list.clear()
+        instruction_all.clear()
+        label_list.clear()
+
+        save_file.close()
+        print("Save file success")
+
+def test_code():
+    try:
+        file_names = os.listdir("test_case")
+    except FileNotFoundError:
+        print("Folder not found")
+        exit(0)
+    for page in range(len(file_names)):
+       
+        if file_names[page].endswith(".txt"):
+            file_path = os.path.join("test_case", file_names[page])
+            with open(file_path, 'r') as file:
+                # อ่านไฟล์และแยกคำสั่ง
+                for line in file:
+                    line = line.lower()
+                    line = line.replace("\n", "")
+                    instruction_all.append(line.split())
+
+                for i in range(len(instruction_all)):
+                    instruction_current = instruction_all[i]
+                    # แปลงคำสั่งเป็น machine code
+                    machine_code = convert_to_machine_code(instruction_current, i)
+                    machine_list.append(machine_code)
+                    # print(f"(address {i}): {machine_code} ({hex(machine_code)})")
+                file.close()
+
+                # บันทึกไฟล์
+                with open(f"expect_code/case{page+1}.txt", "r") as expect_file:
+                    i = 0
+                    for line in expect_file:
+                        line = int(line)
+                        if line == machine_list[i]:
+                            pass
+                        else:
+                            print(f"❌ {file_names[page]} is FAIL")
+                            print(f"expect: {line} but got: {machine_list[i]}")
+                            exit(0)
+                        i += 1
+                    print(f"✅ {file_names[page]} is PASS")
+                    # ล้างค่า
+                    machine_list.clear()
+                    instruction_all.clear()
+                    label_list.clear()
+
+                    expect_file.close()
+
+
+# run assemble
+# OneFile("assembly01.txt")
+# AllFile()
+
+
+# test case
+test_code()
