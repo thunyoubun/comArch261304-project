@@ -1,3 +1,5 @@
 test.py
-
 expectation.txt
+__pycache__
+.pytest_cache
+.vscode/settings.json
