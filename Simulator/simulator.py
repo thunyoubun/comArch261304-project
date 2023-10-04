@@ -179,10 +179,18 @@ class Simulator:
         folder_path = "outputFiles"
 
         try:
+            index = 1
+            baseFilename = "simulateFile.txt"
             os.makedirs(folder_path, exist_ok = True)
-            
-            outputFile = (f"simulateFile.txt")
-            file_path = os.path.join(folder_path, outputFile)
+
+            while True:
+                outputFile = (f"{baseFilename[:-4]}{index}.txt")
+                file_path = os.path.join(folder_path, outputFile)
+
+                if not os.path.isfile(file_path):
+                    break
+                index += 1
+
             try:
                 with open(file_path, 'w') as file:
                     file.write("\n".join(self.tempString))
