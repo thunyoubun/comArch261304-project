@@ -1,0 +1,11 @@
+        lw  0   0   mcand   ; Load mcand into reg 0
+        lw  0   1   mplier  ; Load mplier into reg 1
+        lw  0   2   0       ; Initialize result to 0 in reg 2
+loop    beq 1   0   done    ; If mplier == 0, exit loop
+        add 2   2   0       ; Add mcand to result
+        add 1   1   -1      ; Decrement mplier
+        beq 0   0   loop    ; Repeat loop
+done    sw  0   2   1       ; Store result in reg 1 (return value)
+        halt
+mcand   .fill 32766         ; mcand value
+mplier  .fill 10383         ; mplier value

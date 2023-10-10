@@ -1,0 +1,52 @@
+lw     0    1    n        ; Load n into register $1
+      lw     0    2    r        ; Load r into register $2
+      lw     0    5    stack    ; Initialize stack pointer in register $5
+      lw     0    7    endAddr  ; Load the address of the end into register $7
+combination beq    1    2    if_r_eq_0_or_n_eq_r  ; If r == 0 or n == r, go to that case
+      beq    2    0    if_r_eq_0_or_n_eq_r  ; If case == 0, go to that case
+      lw     0    6    neg1     ; Load -1 into register $6
+      add    1    6    1        ; n = n - 1
+      lw     0    6    pos1     ; Load 1 into register $6
+      sw     5    7    stack    ; Store $7 into the stack
+      add    5    6    5        ; Increment stack
+      sw     5    1    stack    ; Store $1 into stack
+      add    5    7    5        ; Increment stack
+      sw     5    2    stack    ; Store $2 into stack
+      add    5    6    5        ; Increment stack
+      lw     0    6    subAddr  ; Set function call to combination
+      jalr   6    7             ; Call combination(n-1,r)
+      add    3    0    4        ; $3 = $4, save the value
+      lw     0    6    pos1     ; $6 = 1
+      sw     5    4    stack    ; Store $4 into stack
+      lw     0    5    neg1     ; $5 = -1
+      add    5    6    5        ; Decrement stack
+      lw     5    2    stack    ; Recover $2 from stack
+      add    5    6    5        ; Decrement stack
+      lw     5    1    stack    ; Recover $1 from stack
+      add    2    6    2        ; r = r - 1
+      lw     0    6    pos1     ; $6 = 1
+      add    5    7    5        ; Increment stack
+      add    5    7    5        ; Increment stack
+      add    5    7    5        ; Increment stack
+      lw     0    6    subAddr  ; Set function call to combination
+      jalr   6    7             ; Call combination(n-1,r-1)
+      lw     0    6    neg1     ; $6 = -1
+      add    5    6    5        ; Decrement stack
+      lw     5    4    0        ; Recover $4 from stack
+      add    3    4    3        ; $3 = $3 + $4
+      add    5    6    5        ; Decrement stack
+      add    5    6    5        ; Decrement stack
+      add    5    6    5        ; Decrement stack
+      lw     5    7    stack    ; Recover $7 from stack
+      jalr   7    6             ; Return $3
+      end halt
+if_r_eq_0_or_n_eq_r lw     0    6    pos1     ; Load 1 into $6
+      add    0    6    3        ; $3 = $3 + 1
+      jalr   7    6             ; Return 1
+n      .fill  7
+r      .fill  3
+pos1   .fill  1
+neg1   .fill -1
+subAddr .fill combination
+endAddr .fill end
+stack  .fill 0

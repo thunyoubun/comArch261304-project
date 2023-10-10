@@ -197,7 +197,7 @@ def AllFile():
 
     
 
-def OneFile(name_file):
+def OneFile(name_file,address_file):
     try:
         file_names = os.listdir(folder_path)
     except FileNotFoundError:
@@ -205,7 +205,7 @@ def OneFile(name_file):
         exit(0)
     file_path = os.path.join(folder_path,name_file)
     print(f"Page name: {file_path}")
-    with open(file_path,'r') as file:
+    with open(file_path,'r' , encoding="utf-8") as file:
         # อ่านไฟล์และแยกคำสั่ง
         for line in file:
             line = line.lower()
@@ -221,7 +221,7 @@ def OneFile(name_file):
         file.close()
 
         # บันทึกไฟล์
-        save_file = open(f"machine_code/machineTest.txt", "w")
+        save_file = open(f"machine_code/{address_file}", "w")
         for i in range(len(machine_list)):
             save_file.writelines(f"{machine_list[i]}")
             save_file.writelines("\n")
@@ -243,7 +243,7 @@ def test_code():
        
         if file_names[page].endswith(".txt"):
             file_path = os.path.join("test_case", file_names[page])
-            with open(file_path, 'r') as file:
+            with open(file_path, 'r' ,encoding="utf-8") as file:
                 # อ่านไฟล์และแยกคำสั่ง
                 for line in file:
                     line = line.lower()
@@ -280,9 +280,9 @@ def test_code():
 
 
 # run assemble
-# OneFile("assembly01.txt")
+OneFile("multiplication.txt","machine_multiplication.txt")
 # AllFile()
 
 
 # test case
-test_code()
+# test_code()
