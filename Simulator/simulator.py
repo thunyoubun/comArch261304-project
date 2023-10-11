@@ -121,7 +121,7 @@ class Simulator:
             if self.state['reg'][arg0] == self.state['reg'][arg1]:
                 self.state['pc'] += offset
         else:                                                                                                  # else throw exception
-            self.exceptionError("Invalid opcode" + str(opcode))
+            self.exceptionError(f"Invalid opcode" + {opcode})
 
     def executeInstructionType_J(self, opcode, arg0, arg1):                                                             # execute instruction J type
         if not self.isValidRegister(arg0) or not self.isValidRegister(arg1):                                            # check if register(rs), (rt) is invalid
@@ -131,7 +131,15 @@ class Simulator:
             self.state['reg'][arg1] = self.state['pc']                                                         # assign ....
             self.state['pc'] = self.state['reg'][arg0]
         else:                                                                                                  # else throw exception
-            self.exceptionError("Invalid opcode" + str(opcode))
+            self.exceptionError(f"Invalid opcode" + {opcode})
+
+    def executeInstructionType_O(self, opcode):
+        if opcode == 6:
+            self.halt = True
+        elif opcode == 7:
+            pass
+        else:
+            self.exceptionError(f"Invalid opcode" + {opcode})
 
     def executeTask(self):
         self.tempString.append("Example Run of Simulator")                                   # append header string
@@ -146,7 +154,7 @@ class Simulator:
 
         while not self.halt:                                                            # loop until halt equals true
             opcode, arg0, arg1, arg2 = self.parseInstructionFromMemory()                # parse instruction from memory
-
+            print(f"opcode = {opcode}, rs = {arg0}, rt = {arg1}, rd = {arg2}")
             self.state['pc'] += 1                                                       # increment pc + 1                                 
             self.executionCount += 1                                                    # increment execution count + 1
 
@@ -159,10 +167,9 @@ class Simulator:
                 self.executeInstructionType_I(opcode, arg0, arg1, arg2)                 # execute instruction type I
             elif opcode == 5:                                                           # case 5: JALR
                 self.executeInstructionType_J(opcode, arg0, arg1)                       # execute instruction type J
-            elif opcode == 6:                                                           # case 6: HALT
-                self.halt = True
-                break                                        
-            
+            elif opcode == 6 or opcode == 7:                                            # case 6: HALT or NOOP                                    
+                self.executeInstructionType_O(opcode)                                   # execute instruction type O
+
             self.printState()                                                                # print every state after execution for each instruction type
             self.tempString.append(self.formatOutputString())                                # append state following before printState()
 
