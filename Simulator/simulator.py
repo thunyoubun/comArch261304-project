@@ -100,7 +100,7 @@ class Simulator:
         if opcode == 0:                                                                                        # check if opcode is ADD elif NOR                   
             self.state['reg'][dest] = self.state['reg'][arg0] + self.state['reg'][arg1]                        # assign ....
         elif opcode == 1:                                                   
-            self.state['reg'][dest] = ~(self.state['reg'][arg0] | self.state['reg'][arg1])
+            self.state['reg'][dest] = ~(self.state['reg'][arg0] & self.state['reg'][arg1])
         else:                                                                                                  # else throw exception
             self.exceptionError("Invalid opcode" + str(opcode))
     
@@ -111,12 +111,13 @@ class Simulator:
             self.exceptionError(f"Register must be a valid register {arg0}, {arg1}")                                    # throw exception and show value rs, rt
         
         if offset > 32767 or offset < -32768:                                                                           # check if offset is more than maximum positive value or less than minimum negative value 
-            self.exceptionError("Out of range offset")                                                                  # throw exception                                        
+            self.exceptionError("Out of range offset")                                                                  # throw exception
 
         if opcode == 2:                                                                                        # check if opcode is LW elif SW elif BEQ     
             self.state['reg'][arg1] = self.state['mem'][self.state['reg'][arg0] + offset]                      # assign ....
         elif opcode == 3:
             self.state['mem'][self.state['reg'][arg0] + offset] = self.state['reg'][arg1]
+            print(f"{self.state['mem'][self.state['reg'][arg0] + offset]} = {self.state['reg'][arg1]}")
         elif opcode == 4:
             if self.state['reg'][arg0] == self.state['reg'][arg1]:
                 self.state['pc'] += offset
@@ -155,6 +156,7 @@ class Simulator:
         while not self.halt:                                                            # loop until halt equals true
             opcode, arg0, arg1, arg2 = self.parseInstructionFromMemory()                # parse instruction from memory
             print(f"opcode = {opcode}, rs = {arg0}, rt = {arg1}, rd = {arg2}")
+
             self.state['pc'] += 1                                                       # increment pc + 1                                 
             self.executionCount += 1                                                    # increment execution count + 1
 
@@ -172,6 +174,7 @@ class Simulator:
 
             self.printState()                                                                # print every state after execution for each instruction type
             self.tempString.append(self.formatOutputString())                                # append state following before printState()
+            print(f"total of {self.executionCount} instructions executed")
 
         self.tempString.append("machine halted")                                             # if halt is true then print
         self.tempString.append(f"total of {self.executionCount} instructions executed")      # then print total execution count
