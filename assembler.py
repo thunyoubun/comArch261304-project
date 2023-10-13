@@ -280,7 +280,7 @@ def test_code():
 
 
 # run assemble
-OneFile("multiplication.txt","machine_multiplication.txt")
+OneFile("addition.txt","machine_addition.txt")
 # AllFile()
 
 
