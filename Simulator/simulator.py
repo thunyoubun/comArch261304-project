@@ -75,7 +75,7 @@ class Simulator:
 
     ## opcodes table ##
     #   ADD  -> 0
-    #   NOR  -> 1
+    #   NAND  -> 1
     #   LW   -> 2
     #   SW   -> 3
     #   BEQ  -> 4
@@ -95,9 +95,9 @@ class Simulator:
 
     def executeInstructionType_R(self, opcode, arg0, arg1, dest):                                                       # execute instruction R type
         if not self.isValidRegister(arg0) or not self.isValidRegister(arg1) or not self.isValidRegister(dest):          # check if register(rs), (rt), (dest) is invalid 
-            self.exceptionError(f"Register must be a valid register {arg0}, {arg1}, {dest}")                            # throw exception show and value rs, rt, dest
+            self.exceptionError(f"Register must be a valid register rs: {arg0}, rt: {arg1}, dest: {dest}")                            # throw exception show and value rs, rt, dest
 
-        if opcode == 0:                                                                                        # check if opcode is ADD elif NOR                   
+        if opcode == 0:                                                                                        # check if opcode is ADD elif NAND                   
             self.state['reg'][dest] = self.state['reg'][arg0] + self.state['reg'][arg1]                        # assign ....
         elif opcode == 1:                                                   
             self.state['reg'][dest] = ~(self.state['reg'][arg0] & self.state['reg'][arg1])
@@ -109,7 +109,7 @@ class Simulator:
 
         if not self.isValidRegister(arg0) or not self.isValidRegister(arg1):                                            # check if register(rs), (rt) is invalid 
             self.exceptionError(f"Register must be a valid register {arg0}, {arg1}")                                    # throw exception and show value rs, rt
-        
+    
         if offset > 32767 or offset < -32768:                                                                           # check if offset is more than maximum positive value or less than minimum negative value 
             self.exceptionError("Out of range offset")                                                                  # throw exception
 
@@ -117,12 +117,11 @@ class Simulator:
             self.state['reg'][arg1] = self.state['mem'][self.state['reg'][arg0] + offset]                      # assign ....
         elif opcode == 3:
             self.state['mem'][self.state['reg'][arg0] + offset] = self.state['reg'][arg1]
-            print(f"{self.state['mem'][self.state['reg'][arg0] + offset]} = {self.state['reg'][arg1]}")
         elif opcode == 4:
             if self.state['reg'][arg0] == self.state['reg'][arg1]:
                 self.state['pc'] += offset
         else:                                                                                                  # else throw exception
-            self.exceptionError(f"Invalid opcode" + {opcode})
+            self.exceptionError(f"Invalid opcode {opcode}")
 
     def executeInstructionType_J(self, opcode, arg0, arg1):                                                             # execute instruction J type
         if not self.isValidRegister(arg0) or not self.isValidRegister(arg1):                                            # check if register(rs), (rt) is invalid
@@ -154,8 +153,11 @@ class Simulator:
         self.tempString.append(self.formatOutputString())                                    # append first state follow format output print state
 
         while not self.halt:                                                            # loop until halt equals true
+            if self.executionCount >= self.maximumMemory:
+                break
+
             opcode, arg0, arg1, arg2 = self.parseInstructionFromMemory()                # parse instruction from memory
-            print(f"opcode = {opcode}, rs = {arg0}, rt = {arg1}, rd = {arg2}")
+            print(f"\nopcode = {opcode}, rs = {arg0}, rt = {arg1}, rd = {arg2}")
 
             self.state['pc'] += 1                                                       # increment pc + 1                                 
             self.executionCount += 1                                                    # increment execution count + 1
