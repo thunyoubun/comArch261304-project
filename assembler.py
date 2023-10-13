@@ -215,6 +215,7 @@ def OneFile(name_file,address_file):
         for i in range(len(instruction_all)):
             instruction_current = instruction_all[i]
             # แปลงคำสั่งเป็น machine code
+            # print(instruction_current)
             machine_code = convert_to_machine_code(instruction_current, i)
             machine_list.append(machine_code)
             print(f"(address {i}): {machine_code} ({hex(machine_code)})")
