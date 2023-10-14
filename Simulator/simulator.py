@@ -75,7 +75,7 @@ class Simulator:
 
     ## opcodes table ##
     #   ADD  -> 0
-    #   NAND  -> 1
+    #   NAND -> 1
     #   LW   -> 2
     #   SW   -> 3
     #   BEQ  -> 4
@@ -87,49 +87,73 @@ class Simulator:
         memoryValue = self.state['mem'][self.state['pc']]
 
         opcode = (memoryValue >> 22) & 0b111
-        arg0 = (memoryValue >> 19) & 0b111
-        arg1 = (memoryValue >> 16) & 0b111
-        arg2 = memoryValue & 0xFFFF
+        rs = (memoryValue >> 19) & 0b111
+        rt = (memoryValue >> 16) & 0b111
+        rd = memoryValue & 0xFFFF
         
-        return opcode, arg0, arg1, arg2
+        return opcode, rs, rt, rd
+    
 
-    def executeInstructionType_R(self, opcode, arg0, arg1, dest):                                                       # execute instruction R type
-        if not self.isValidRegister(arg0) or not self.isValidRegister(arg1) or not self.isValidRegister(dest):          # check if register(rs), (rt), (dest) is invalid 
-            self.exceptionError(f"Register must be a valid register rs: {arg0}, rt: {arg1}, dest: {dest}")                            # throw exception show and value rs, rt, dest
+    def executeInstructionType_R(self, opcode, rs, rt, dest):                                                       # execute instruction R type
+        def nand_operation(a, b):
+            # Convert decimal numbers to binary strings
+            binary_a = bin(a)[2:]
+            binary_b = bin(b)[2:]
 
-        if opcode == 0:                                                                                        # check if opcode is ADD elif NAND                   
-            self.state['reg'][dest] = self.state['reg'][arg0] + self.state['reg'][arg1]                        # assign ....
+            # Ensure the binary strings have the same length by adding leading zeros
+            max_len = max(len(binary_a), len(binary_b))
+            binary_a = binary_a.zfill(max_len)
+            binary_b = binary_b.zfill(max_len)
+
+            # Perform the NAND operation bit by bit
+            result = ""
+            for bit_a, bit_b in zip(binary_a, binary_b):
+                result += '0' if bit_a == '1' and bit_b == '1' else '1'
+
+            # Convert the binary result to decimal
+            decimal_result = int(result, 2)
+            return decimal_result
+        
+        if not self.isValidRegister(rs) or not self.isValidRegister(rt) or not self.isValidRegister(dest):          # check if register(rs), (rt), (dest) is invalid 
+            self.exceptionError(f"Register must be a valid register rs: {rs}, rt: {rt}, dest: {dest}")                            # throw exception show and value rs, rt, dest
+
+        if opcode == 0:                                                                                         # check if opcode is ADD elif NAND                   
+            self.state['reg'][dest] = self.state['reg'][rs] + self.state['reg'][rt]                             # assign ....
         elif opcode == 1:                                                   
-            self.state['reg'][dest] = ~(self.state['reg'][arg0] & self.state['reg'][arg1])
-        else:                                                                                                  # else throw exception
+            self.state['reg'][dest] = nand_operation(self.state['reg'][rs], self.state['reg'][rt])                             # Perform the NAND operation
+            
+            #~ (self.state['reg'][rs] & self.state['reg'][rt])
+            #print(f"register[{rs}]:{self.state['reg'][rs]} register[{rt}]: {self.state['reg'][rt]}")
+            #print(f"result after nand: {self.state['reg'][dest]}")
+        else:                                                                                                   # else throw exception
             self.exceptionError("Invalid opcode" + str(opcode))
     
-    def executeInstructionType_I(self, opcode, arg0, arg1, offset):                                                     # execute instruction I type
-        offset = self.convertNumber(offset)                                                                             # assign offset to 2's complement
+    def executeInstructionType_I(self, opcode, rs, rt, offset):                                                     # execute instruction I type
+        offset = self.convertNumber(offset & 0xffff)                                                                             # assign offset to 2's complement
 
-        if not self.isValidRegister(arg0) or not self.isValidRegister(arg1):                                            # check if register(rs), (rt) is invalid 
-            self.exceptionError(f"Register must be a valid register {arg0}, {arg1}")                                    # throw exception and show value rs, rt
+        if not self.isValidRegister(rs) or not self.isValidRegister(rt):                                            # check if register(rs), (rt) is invalid 
+            self.exceptionError(f"Register must be a valid register {rs}, {rt}")                                    # throw exception and show value rs, rt
     
         if offset > 32767 or offset < -32768:                                                                           # check if offset is more than maximum positive value or less than minimum negative value 
             self.exceptionError("Out of range offset")                                                                  # throw exception
 
         if opcode == 2:                                                                                        # check if opcode is LW elif SW elif BEQ     
-            self.state['reg'][arg1] = self.state['mem'][self.state['reg'][arg0] + offset]                      # assign ....
+            self.state['reg'][rt] = self.state['mem'][self.state['reg'][rs] + offset]                      # assign ....
         elif opcode == 3:
-            self.state['mem'][self.state['reg'][arg0] + offset] = self.state['reg'][arg1]
+            self.state['mem'][self.state['reg'][rs] + offset] = self.state['reg'][rt]
         elif opcode == 4:
-            if self.state['reg'][arg0] == self.state['reg'][arg1]:
+            if self.state['reg'][rs] == self.state['reg'][rt]:
                 self.state['pc'] += offset
         else:                                                                                                  # else throw exception
             self.exceptionError(f"Invalid opcode {opcode}")
 
-    def executeInstructionType_J(self, opcode, arg0, arg1):                                                             # execute instruction J type
-        if not self.isValidRegister(arg0) or not self.isValidRegister(arg1):                                            # check if register(rs), (rt) is invalid
-            self.exceptionError(f"Register must be a valid register {arg0}, {arg1}")                                    # throw exception and show value rs, rt
+    def executeInstructionType_J(self, opcode, rs, rt):                                                             # execute instruction J type
+        if not self.isValidRegister(rs) or not self.isValidRegister(rt):                                            # check if register(rs), (rt) is invalid
+            self.exceptionError(f"Register must be a valid register {rs}, {rt}")                                    # throw exception and show value rs, rt
 
         if opcode == 5:                                                                                        # check if opcode is JARL
-            self.state['reg'][arg1] = self.state['pc']                                                         # assign ....
-            self.state['pc'] = self.state['reg'][arg0]
+            self.state['reg'][rt] = self.state['pc']                                                         # assign ....
+            self.state['pc'] = self.state['reg'][rs]
         else:                                                                                                  # else throw exception
             self.exceptionError(f"Invalid opcode" + {opcode})
 
@@ -156,8 +180,8 @@ class Simulator:
             if self.executionCount >= self.maximumMemory:
                 break
 
-            opcode, arg0, arg1, arg2 = self.parseInstructionFromMemory()                # parse instruction from memory
-            print(f"\nopcode = {opcode}, rs = {arg0}, rt = {arg1}, rd = {arg2}")
+            opcode, rs, rt, rd = self.parseInstructionFromMemory()                # parse instruction from memory
+            print(f"\nopcode = {opcode}, rs = {rs}, rt = {rt}, rd = {rd}")
 
             self.state['pc'] += 1                                                       # increment pc + 1                                 
             self.executionCount += 1                                                    # increment execution count + 1
@@ -166,11 +190,11 @@ class Simulator:
                 self.exceptionError("PC out of memory!!!")                              # throw exception                           
 
             if opcode == 0 or opcode == 1:                                              # case 0: ADD or case 1: NOR
-                self.executeInstructionType_R(opcode, arg0, arg1, arg2)                 # execute instruction type R
+                self.executeInstructionType_R(opcode, rs, rt, rd)                 # execute instruction type R
             elif opcode == 2 or opcode == 3 or opcode == 4:                             # case 2: LW or case 3: SW or case 4: BEQ
-                self.executeInstructionType_I(opcode, arg0, arg1, arg2)                 # execute instruction type I
+                self.executeInstructionType_I(opcode, rs, rt, rd)                 # execute instruction type I
             elif opcode == 5:                                                           # case 5: JALR
-                self.executeInstructionType_J(opcode, arg0, arg1)                       # execute instruction type J
+                self.executeInstructionType_J(opcode, rs, rt)                       # execute instruction type J
             elif opcode == 6 or opcode == 7:                                            # case 6: HALT or NOOP                                    
                 self.executeInstructionType_O(opcode)                                   # execute instruction type O
 
