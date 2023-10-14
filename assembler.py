@@ -10,10 +10,13 @@ def isNumber(s):
 
 
 def hasLabel(instruction):
-    if instruction[0] in ['add', 'nand', 'lw', 'sw', 'beq', 'jalr', 'halt', 'noop', '.fill']:
+    if instruction[0] in opcode_table : #check ว่าเป็นคำสั่งหรือไม่
         return False
     else:
-        return True
+        if isNumber(instruction[1]):
+            return False
+        else:
+            return True
 
 
 def getReg(reg):
@@ -177,7 +180,7 @@ def AllFile():
                 for i in range(len(instruction_all)):
                     instruction_current = instruction_all[i]
                     # แปลงคำสั่งเป็น machine code
-                    machine_code = convert_to_machine_code(instruction_current, i)
+                    machine_code = convert_to_machine_code(instruction_current[0:4], i)
                     machine_list.append(machine_code)
                     print(f"(address {i}): {machine_code} ({hex(machine_code)})")
                 file.close()
@@ -255,7 +258,11 @@ def test_code():
                 for i in range(len(instruction_all)):
                     instruction_current = instruction_all[i]
                     # แปลงคำสั่งเป็น machine code
-                    machine_code = convert_to_machine_code(instruction_current, i)
+                    try:
+                        machine_code = convert_to_machine_code(instruction_current, i)
+                    except:
+                        print(f"❌ {file_names[page]} is FAIL")
+                        exit(0)
                     machine_list.append(machine_code)
                     # print(f"(address {i}): {machine_code} ({hex(machine_code)})")
                 file.close()
@@ -283,10 +290,10 @@ def test_code():
 
 #### run assembler ###
 
-OneFile("combination.txt","machine_combination.txt")
+# OneFile("combination.txt","machine_combination.txt")
 # AllFile()
 
 
 #### test case ###
 
-# test_code()
+test_code()
