@@ -29,7 +29,8 @@ def offsetField(name_instruction, reg3, pc):
     else:  # เป็น Symbolic address
         adds = findAddressLabel(reg3)
         if adds == None:
-            raise Exception(f"ERROR: label {reg3} not found", exit(0))
+            print(f"ERROR: label {reg3} not found")
+            exit(0)
         else:
             if name_instruction == 'beq':
                 # offsetFiled ของ beq คือ ตำแหน่งของคำสั่งถัดไป - ตำแหน่งของคำสั่งปัจจุบัน - 1
@@ -66,13 +67,13 @@ def analyze_instruction(instruction):
         inst_type = opcode_table[instruction]["type"]
         return opcode, inst_type
     else:
-        raise Exception(
-            f"ERROR: instruction {instruction} not found ", exit(0))
+        print(f"ERROR: instruction {instruction} not found ")
+        exit(0)
     
 
 # แปลงคำสั่งเป็น machine code
 def convert_to_machine_code(instruction, idx):
-
+    
     # ตรวจสอบว่ามี label หรือไม่
     if not hasLabel(instruction):  # ไม่มี label
         # [0] = name_instruction ,[1] = regA, [2] = regB, [3] = destReg
@@ -280,10 +281,12 @@ def test_code():
                     expect_file.close()
 
 
-# run assemble
-OneFile("addition.txt","machine_addition.txt")
+#### run assembler ###
+
+OneFile("combination.txt","machine_combination.txt")
 # AllFile()
 
 
-# test case
+#### test case ###
+
 # test_code()
