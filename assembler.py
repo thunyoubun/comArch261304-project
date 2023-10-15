@@ -172,7 +172,8 @@ def AllFile():
             file_path = os.path.join(folder_path, file_names[page])
             with open(file_path, 'r') as file:
                 # อ่านไฟล์และแยกคำสั่ง
-                for line in file:
+                lines = [line.strip() for line in file if line.strip()]
+                for line in lines:
                     line = line.lower()
                     line = line.replace("\n", "")
                     instruction_all.append(line.split())
@@ -211,7 +212,8 @@ def OneFile(name_file,address_file):
     print(f"Page name: {file_path}")
     with open(file_path,'r' , encoding="utf-8") as file:
         # อ่านไฟล์และแยกคำสั่ง
-        for line in file:
+        lines = [line.strip() for line in file if line.strip()]
+        for line in lines:
             line = line.lower()
             line = line.replace("\n", "")
             instruction_all.append(line.split())
@@ -249,8 +251,10 @@ def test_code():
         if file_names[page].endswith(".txt"):
             file_path = os.path.join("test_case", file_names[page])
             with open(file_path, 'r' ,encoding="utf-8") as file:
+                lines = [line.strip() for line in file if line.strip()]
                 # อ่านไฟล์และแยกคำสั่ง
-                for line in file:
+                
+                for line in lines:       
                     line = line.lower()
                     line = line.replace("\n", "")
                     instruction_all.append(line.split())
@@ -290,10 +294,10 @@ def test_code():
 
 #### run assembler ###
 
-# OneFile("combination.txt","machine_combination.txt")
+OneFile("combination.txt","machine_combination.txt")
 # AllFile()
 
 
 #### test case ###
 
-test_code()
+# test_code()
