@@ -1,10 +1,8 @@
-    lw    0    1    n            ; Load n from memory
+   lw    0    1    n            ; Load n from memory
     lw    0    2    r            ; Load r from memory
     lw    0    5    stack        ; Initialize stack pointer
-    beq   2    0    leaf         ; If r == 0, return 1
-    beq   1    2    leaf         ; If n == r, return 1
-    lw    0    7    comAddr      ; Load the address of the end label
-    jalr  6    7                 ; Call label combination(n, r)
+    lw    0    7    comAddr      ; Load the address of the combination label
+    jalr  6    7                 ; Call combination(n, r)
     halt
 combination lw    0    6    pos1   ; Load 1 into reg6
     sw    5    7    stack       ; Store $7 (return address) into the stack
@@ -13,12 +11,13 @@ combination lw    0    6    pos1   ; Load 1 into reg6
     add   5    6    5           ; Increment stack
     sw    5    2    stack       ; Store $2 (r) into the stack
     add   5    6    5           ; Increment stack
-    beq   2    0    leaf        ; If r == 0, return 1 ///
-    beq   1    2    leaf        ; If n == r, return 1 ///
+    beq   2    0    leaf        ; If r == 0, go to leaf ///
+    beq   1    2    leaf        ; If n == r, go to leaf ///
     lw    0    6    neg1        ; Load -1 into reg6  
     add   1    6    1           ; n = n - 1
     lw    0    6    comAddr     ; Load the address of the combination function
     jalr  6    7                ; Call combination(n-1, r)
+    lw    0    6    neg1        ; Load -1 into reg6 
     add   2    6    2           ; r = r - 1
     lw    0    6    comAddr     ; Load the address of the combination function
     jalr  6    7                ; Call combination(n-1, r-1)
@@ -29,7 +28,7 @@ Load lw  0  6  neg1
     lw    5    1    stack       ; Restore $1 (n) from the stack 
     add   5    6    5           ; Decrement stack
     lw    5    7    stack       ; Restore $7 (return address) from the stack
-    jalr  7    6                ; Return
+    jalr  7    5                ; Return
 leaf lw    0    4   pos1        ; Load 1 into reg4
     add   3    4    3           ; result = result + 1
     beq   0    0    Load
