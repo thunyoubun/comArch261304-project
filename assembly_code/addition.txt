@@ -1,25 +1,21 @@
-            lw   1   0   n              ; Load n into register $1
-            lw   2   0   r              ; Load r into register $2
-            lw   5   0   stack          ; Initialize stack pointer in register $5
-            lw   7   0   5              ; Load the address of the end into register $7
-addition    beq  2   0   base_case     ; If r == 0, equal to n is the result
-            beq  2   1   base_case     ; If r == n, equal to n is the result
-            add  4   2   -1          
-            add  2   1   -1          ; $2 = n - 1
-            lw   0   6   addition      ; Set function call to addition(r-1, n-1)
-            jalr 6   6   0            ; Call function addition(r-1, n-1)
-negative_case add  4   2   -1          ; $4 = r - 1
-            add  2   1   1          ; $2 = n + 1
-            lw   0   6   addition      ; Set function call to addition(r-1, n+1)
-            jalr 6   6   0              ; Call addition(r-1, n+1)
-            add  2   2   -1          ; Decrement n
-base_case   beq  2   0   5            ; If n == 0, return 0
-            lw   3   0   1            ; $3 = n
-            jalr 7   6   0            ; Return 1
-end         .fill   0
-n           .fill   0
-r           .fill   0
-stack       .fill   0
-result      .fill   0
-pos1        .fill   1
-neg1        .fill  -1
+                lw   1   0   n              ; Load n into register $1
+                lw   2   0   r              ; Load r into register $2
+                lw   5   0   stack          ; Initialize stack pointer in register $5
+                lw   7   0   9              ; Load the address of the end into register $7
+addition        beq  2   0   base_case     ; If r == 0, equal to n is the result
+                beq  2   1   base_case     ; If r == n, equal to n is the result
+                add  4   2   -1
+                add  2   1   -1          ; $2 = n - 1
+                lw   0   6   addition      ; Set function call to addition(r-1, n-1)
+                jalr 6   6   0            ; Call function addition(r-1, n-1)
+negative_case   add  4   2   -1          ; $4 = r - 1
+                add  2   1   1          ; $2 = n + 1
+                lw   0   6   addition      ; Set function call to addition(r-1, n+1)
+                jalr 6   6   0              ; Call addition(r-1, n+1)
+                add  2   2   -1          ; Decrement n
+base_case       beq  2   0   9            ; If n == 0, return 0
+                lw   3   0   1            ; $3 = n
+                jalr 7   6   0            ; Return 1
+n               .fill   0
+r               .fill   0
+stack           .fill   0

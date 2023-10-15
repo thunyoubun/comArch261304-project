@@ -13,9 +13,9 @@ end_loop    add     1       1       1           ; ทำการ shift left mca
             beq     4       0       end_loop    ; ถ้า &4 == 0 ให้ออกจาก loop
             beq     0       0       while_loop
 noop
-end halt
-mcand    .fill   32766
-mplier   .fill   10384
-pos1     .fill   1
-neg1     .fill   -1
-bit_count .fill   15
+end         halt
+mcand       .fill   32766
+mplier      .fill   10384
+pos1        .fill   1
+neg1        .fill   -1
+bit_count   .fill   15

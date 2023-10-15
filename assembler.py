@@ -22,7 +22,6 @@ def hasLabel(instruction):
 def getReg(reg):
     if isNumber(reg):
         reg = int(reg)
-
     return reg
 
 
