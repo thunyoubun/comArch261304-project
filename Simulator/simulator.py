@@ -151,10 +151,28 @@ class Simulator:
         if not self.isValidRegister(rs) or not self.isValidRegister(rt):                                            # check if register(rs), (rt) is invalid
             self.exceptionError(f"Register must be a valid register {rs}, {rt}")                                    # throw exception and show value rs, rt
 
-        if opcode == 5:                                                                                        # check if opcode is JARL
-            self.state['reg'][rt] = self.state['pc']                                                         # assign ....
-            self.state['pc'] = self.state['reg'][rs]
-        else:                                                                                                  # else throw exception
+        if opcode == 5:                                                                                             # check if opcode is JARL
+            print(f"regA: {rs}, regB: {rt}, PC: {self.state['pc']}")
+            #tempRegA = rs
+            #print(f"tempA: {tempRegA}")
+
+            if self.state['reg'][rs] == self.state['reg'][rt]:
+                self.state['reg'][rt] = self.state['pc'] + 1  
+                
+            else:
+                self.state['reg'][rs], self.state['reg'][rt] = rt, rs
+            self.state['pc'] + 1 
+
+
+            #if self.state['reg'][rs] == self.state['reg'][rt]:
+            #    self.state['reg'][rt] = self.state['pc'] + 1                                                                                # assign ....
+            #    print(f"regB: {self.state['reg'][rt]}")
+            #else:
+            #    self.state['reg'][rt] = self.state['pc']
+            #    self.state['reg'][rs] = self.state['reg'][rt]
+
+            print(f"JALR instruction executed: rs[{rt}] = {self.state['reg'][rt]}, PC={self.state['pc']}")
+        else:                                                                                                       # else throw exception
             self.exceptionError(f"Invalid opcode" + {opcode})
 
     def executeInstructionType_O(self, opcode):
