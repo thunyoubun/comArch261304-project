@@ -237,7 +237,7 @@ def OneFile(name_file):
         label_list.clear()
 
         save_file.close()
-        print("Save file success")
+        print(f"Save file success at machine_code/machine_{name_file}")
 
 def test_code():
     try:
