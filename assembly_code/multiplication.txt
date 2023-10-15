@@ -1,21 +1,21 @@
-            lw      0       1       mcand       ; โหลดค่า mcand ลงที่ register 1
-            lw      0       2       mplier      ; โหลดค่า mplier ลงที่ register 2
-            lw      0       3       pos1        ; โหลดค่า 1 ลงที่ register 3
-            lw      0       4       bit_count   ; โหลดค่า 15 ลงที่ register 4
+            lw      0       1       mcand
+            lw      0       2       mplier
+            lw      0       3       pos1
+            lw      0       4       bit_count
 while_loop  nand    2       3       5
-            nand    5       5       5           ; &2 and *3
+            nand    5       5       5
             beq     5       0       end_loop
-            add     6       1       6           ; เพิ่มผลลัพธ์ที่เก็บใน register 6
-end_loop    add     1       1       1           ; ทำการ shift left mcand 1 ครั้ง
-            add     3       3       3           ; ทำการ shift left &3, 0000 0000 0000 0001
-            lw      0       7       neg1        ; โหลดค่า -1 ลงที่ register 7
-            add     4       7       4           ; ทำการลบ 1 จาก &4 (15 bit - 1)
-            beq     4       0       end_loop    ; ถ้า &4 == 0 ให้ออกจาก loop
+            add     6       1       6
+end_loop    add     1       1       1
+            add     3       3       3
+            lw      0       7       neg1
+            add     4       7       4
+            beq     4       0       end
             beq     0       0       while_loop
-noop
+            noop
 end         halt
-mcand       .fill   32766
-mplier      .fill   10384
-pos1        .fill   1
-neg1        .fill   -1
-bit_count   .fill   15
+mcand    .fill   32766
+mplier   .fill   10384
+pos1     .fill   1
+neg1     .fill   -1
+bit_count .fill   15
