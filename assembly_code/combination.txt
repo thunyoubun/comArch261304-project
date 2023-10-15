@@ -1,60 +1,41 @@
-                lw    0    1    n          ; Load n from memory
-                lw    0    2    r          ; Load r from memory
-                lw    0    5    stack      ; Initialize stack pointer
-                lw    0    7    endAddr    ; Load the address of the end label
-                jalr  6    7              ; Call combination(n, r)
-                halt
-combination     beq   1    2    base_case_1  ; If n == r, return 1
-                beq   1    0    base_case_2  ; If n == 0, return 1
-                lw    0    6    neg1        ; Load -1 into reg6
-                add   1    6    1           ; n = n - 1
-                lw    0    6    pos1        ; Load 1 into reg6
-                sw    5    7    stack       ; Store $7 (return address) into the stack
-                add   5    6    5           ; Increment stack
-                sw    5    1    stack       ; Store $1 (n) into the stack
-                add   5    6    5           ; Increment stack
-                sw    5    2    stack       ; Store $2 (r) into the stack
-                add   5    6    5           ; Increment stack
-                lw    0    6    comAddr     ; Load the address of the combination function
-                jalr  6    7                ; Call combination(n-1, r)
-                add   3    0    4           ; result = result + $4
-                lw    0    6    pos1        ; Load 1 into reg6
-                sw    5    4    stack       ; Store $4 into the stack
-                add   5    6    5           ; Increment stack
-                lw    5    2    stack       ; Restore $2 (r) from the stack
-                add   5    6    5           ; Increment stack
-                lw    5    1    stack       ; Restore $1 (n) from the stack
-                add   2    6    2           ; r = r - 1
-                lw    0    6    pos1        ; Load 1 into reg6
-                add   5    6    5           ; Increment stack
-                add   5    6    5           ; Increment stack
-                add   5    6    5           ; Increment stack
-                lw    0    6    comAddr     ; Load the address of the combination function
-                jalr  6    7                ; Call combination(n-1, r-1)
-                lw    0    6    neg1        ; Load -1 into reg6
-                add   5    6    5           ; Decrement stack
-                lw    5    4    stack       ; Restore $4 from the stack
-                add   3    4    3           ; result = result + $4
-                add   5    6    5           ; Decrement stack
-                add   5    6    5           ; Decrement stack
-                add   5    6    5           ; Decrement stack
-                lw    5    7    stack       ; Restore $7 (return address) from the stack
-                jalr  7    6                ; Return
-base_case_1     add   3    0    3    ; n == r, return 1
-                add   1    0    1           ; Decrement n
-                lw    0    6    pos1        ; Load 1 into reg6
-                sw    5    7    stack       ; Store $7 (return address) into the stack
-                jalr  7    6                ; Return
-base_case_2     add   3    0    3    ; n == 0, return 1
-                add   2    0    2           ; Decrement r
-                lw    0    6    pos1        ; Load 1 into reg6
-                sw    5    7    stack       ; Store $7 (return address) into the stack
-                jalr  7    6                ; Return
-end             halt
-n               .fill  7
-r               .fill  3
-pos1            .fill  1
-neg1            .fill -1
-comAddr         .fill combination
-stack           .fill 0
-endAddr         .fill end
+    lw    0    1    n            ; Load n from memory
+    lw    0    2    r            ; Load r from memory
+    lw    0    5    stack        ; Initialize stack pointer
+    beq   2    0    leaf         ; If r == 0, return 1
+    beq   1    2    leaf         ; If n == r, return 1
+    lw    0    7    comAddr      ; Load the address of the end label
+    jalr  6    7                 ; Call label combination(n, r)
+    halt
+combination lw    0    6    pos1   ; Load 1 into reg6
+    sw    5    7    stack       ; Store $7 (return address) into the stack
+    add   5    6    5           ; Increment stack
+    sw    5    1    stack       ; Store $1 (n) into the stack
+    add   5    6    5           ; Increment stack
+    sw    5    2    stack       ; Store $2 (r) into the stack
+    add   5    6    5           ; Increment stack
+    beq   2    0    leaf        ; If r == 0, return 1 ///
+    beq   1    2    leaf        ; If n == r, return 1 ///
+    lw    0    6    neg1        ; Load -1 into reg6  
+    add   1    6    1           ; n = n - 1
+    lw    0    6    comAddr     ; Load the address of the combination function
+    jalr  6    7                ; Call combination(n-1, r)
+    add   2    6    2           ; r = r - 1
+    lw    0    6    comAddr     ; Load the address of the combination function
+    jalr  6    7                ; Call combination(n-1, r-1)
+Load lw  0  6  neg1    
+    add   5    6    5           ; Decrement stack
+    lw    5    2    stack       ; Restore $2 (r) from the stack
+    add   5    6    5           ; Decrement stack
+    lw    5    1    stack       ; Restore $1 (n) from the stack 
+    add   5    6    5           ; Decrement stack
+    lw    5    7    stack       ; Restore $7 (return address) from the stack
+    jalr  7    6                ; Return
+leaf lw    0    4   pos1        ; Load 1 into reg4
+    add   3    4    3           ; result = result + 1
+    beq   0    0    Load
+n      .fill  7
+r      .fill  3
+pos1   .fill  1
+neg1   .fill -1
+comAddr .fill combination
+stack  .fill 0

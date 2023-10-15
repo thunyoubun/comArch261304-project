@@ -298,7 +298,7 @@ def test_code():
 
 #### run assembler ###
 
-OneFile("multiplication.txt")
+OneFile("combination.txt")
 # AllFile()
 
 
