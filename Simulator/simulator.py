@@ -236,7 +236,7 @@ class Simulator:
                 self.executeInstructionType_J(opcode, rs, rt) 
             # case 6: HALT or NOOP then execute instruction type O                      
             elif opcode == 6 or opcode == 7:                                                                             
-                self.executeInstructionType_O(opcode)                                  
+                self.executeInstructionType_O(opcode)                                 
 
             # print every state after execution for each instruction type
             self.printState()
