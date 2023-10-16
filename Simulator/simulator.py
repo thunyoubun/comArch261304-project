@@ -1,8 +1,9 @@
 import os
 
 class Simulator:
+    # กำหนดค่าเริ่มต้นของระบบ 
     def __init__(self):
-        self.maximumMemory = 65536                    # constant for maximum memory and number of registers
+        self.maximumMemory = 65536                  # constant for maximum memory and number of registers
         self.numberRegisters = 8                      
         self.executionCount = 0                       # Initialize execution count
         self.halt = False                             # Initialize halt flag to False
@@ -14,7 +15,9 @@ class Simulator:
             'reg': [0] * self.numberRegisters,        
             'numMemory': 0                            # number of memory world initialized with zero
         }
-        
+    
+    # โหลด machine code ที่เป็น hex จากการผ่าน assembler 
+    # โหลดเป็น line ใส่ state mem
     def loadMachineCode(self, machineCodeFile):
         folder_path = "machineCodeFiles"
         try:
@@ -31,8 +34,9 @@ class Simulator:
                 self.exceptionError(f"Machine code file not found {machineCodeFile}")
         except FileNotFoundError:
             self.exceptionError(f"Folder machine code files not found {folder_path}")
-    
-    def printState(self):                                                   # print the state of the Simulator
+
+    # print the state of the Simulator
+    def printState(self):                                                   
         print("\n@@@\nstate:")
         print(f"\tpc {self.state['pc']}")
 
@@ -46,6 +50,7 @@ class Simulator:
 
         print("end state")
 
+    # เก็บ format print state ใส่ list string ไว้ไปใส่ใน output file
     def formatOutputString(self):
         state_str = ["@@@", "state:"]
         state_str.append(f"\tpc {self.state['pc']}")
@@ -62,12 +67,15 @@ class Simulator:
     
         return '\n'.join(state_str)
 
-    def exceptionError(self, message):                                      # Display an error message
+    # Display an error message
+    def exceptionError(self, message):                                      
         print(f"exception {message}")
 
+    # check if register >= 0 or <= 8
     def isValidRegister(self, register):
         return 0 <= register < self.numberRegisters                         # returns 0 if the register is valid
     
+    # convert integer
     def convertNumber(self, number):                                        # Convert a signed 16-bit number to a Python integer
         if number & (1 << 15):
             number -= (1 << 16)
@@ -83,6 +91,7 @@ class Simulator:
     #   HALT -> 6
     #   NOOP -> 7
 
+
     def parseInstructionFromMemory(self):                                   # Parse an instruction from memory and extract opcode and arguments
         memoryValue = self.state['mem'][self.state['pc']]
 
@@ -91,7 +100,8 @@ class Simulator:
         rt = (memoryValue >> 16) & 0b111
         rd = memoryValue & 0xFFFF
         
-        return opcode, rs, rt, rd
+        print(opcode, rs, rt, rd)
+        return opcode, rs, rt, rd       # Return decimals arguments
     
 
     def executeInstructionType_R(self, opcode, rs, rt, dest):                                                       # execute instruction R type
@@ -141,6 +151,10 @@ class Simulator:
             self.state['reg'][rt] = self.state['mem'][self.state['reg'][rs] + offset]                      # assign ....
         elif opcode == 3:
             self.state['mem'][self.state['reg'][rs] + offset] = self.state['reg'][rt]
+
+            self.state['numMemory'] += 1
+
+            print(f"{self.state['reg'][rs] + offset}")
         elif opcode == 4:
             if self.state['reg'][rs] == self.state['reg'][rt]:
                 self.state['pc'] += offset
@@ -153,23 +167,12 @@ class Simulator:
 
         if opcode == 5:                                                                                             # check if opcode is JARL
             print(f"regA: {rs}, regB: {rt}, PC: {self.state['pc']}")
-            #tempRegA = rs
-            #print(f"tempA: {tempRegA}")
 
-            if self.state['reg'][rs] == self.state['reg'][rt]:
-                self.state['reg'][rt] = self.state['pc'] + 1  
-                
-            else:
-                self.state['reg'][rs], self.state['reg'][rt] = rt, rs
-            self.state['pc'] + 1 
-
-
-            #if self.state['reg'][rs] == self.state['reg'][rt]:
-            #    self.state['reg'][rt] = self.state['pc'] + 1                                                                                # assign ....
-            #    print(f"regB: {self.state['reg'][rt]}")
-            #else:
-            #    self.state['reg'][rt] = self.state['pc']
-            #    self.state['reg'][rs] = self.state['reg'][rt]
+            self.state['reg'][rt] = self.state['reg'][rs]
+            self.state['reg'][rs] = self.state['pc']
+            
+            self.state['reg'][rs], self.state['reg'][rt] = self.state['reg'][rt], self.state['reg'][rs]
+            self.state['pc'] = self.state['reg'][rs]
 
             print(f"JALR instruction executed: rs[{rt}] = {self.state['reg'][rt]}, PC={self.state['pc']}")
         else:                                                                                                       # else throw exception
@@ -184,9 +187,11 @@ class Simulator:
             self.exceptionError(f"Invalid opcode" + {opcode})
 
     def executeTask(self):
-        self.tempString.append("Example Run of Simulator")                                   # append header string
-        print("Example Run of Simulator")                                                    # print machine code form memory indexes   
+        # append header string
+        self.tempString.append("Example Run of Simulator")                                   
+        print("Example Run of Simulator")                                                    
 
+        # print machine code form memory indexes   
         for i in range(self.state['numMemory']):
             print((f"memory[{i}] = {self.state['mem'][i]}"))
             self.tempString.append(f"memory[{i}] = {self.state['mem'][i]}")
